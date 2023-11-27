@@ -3,3 +3,8 @@
 @tailwind utilities;
 
 
+
+  
+body {
+    color: rgb(var(--foreground-rgb));
+}
