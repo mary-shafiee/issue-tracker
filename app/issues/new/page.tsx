@@ -16,30 +16,33 @@ import Spinner from '@/app/components/Spinner';
 
 type IssueForm= z.infer<typeof createIssueSchema>
 
+
 const NewIssuePage = () => {
+
  const route = useRouter()
  const [error , setError] = useState('');
  const [isSubmiting , setIsSubmiting] = useState(false)
   const {register , control , handleSubmit , formState : {errors}}= useForm<IssueForm>({
     resolver : zodResolver(createIssueSchema)
    });
+  const onSubmit = handleSubmit(async(data) =>
+{
+  try{
+    setIsSubmiting(true)
+    await axios.post('/api/issues' , data)
+    route.push('/issues')
+  }catch(error){
+    setIsSubmiting(false)
+    setError('An Usexpected Error Accurred ')
+  }
+
+})
   return (
     <div className='max-w-xl '>
       {error && <Callout.Root color='red' className='mb-5'>
         <Callout.Text>{error}</Callout.Text>
         </Callout.Root>}
-      <form className='space-y-2' onSubmit={handleSubmit(async(data) =>
-        {
-          try{
-            setIsSubmiting(true)
-            await axios.post('/api/issues' , data)
-            route.push('/issues')
-          }catch(error){
-            setIsSubmiting(false)
-            setError('An Usexpected Error Accurred ')
-          }
-        
-      })}>
+      <form className='space-y-2' onSubmit={onSubmit}>
           <TextField.Root>
           <TextField.Input placeholder="Write Title" {...register('title')}/>
           </TextField.Root>
