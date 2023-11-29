@@ -10,6 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { createIssueSchema } from '@/app/validationSchema';
 import { TypeOf, z } from 'zod';
 import ErrorMessage from '@/app/components/ErrorMessage';
+import Spinner from '@/app/components/Spinner';
 
 
 
@@ -17,7 +18,8 @@ type IssueForm= z.infer<typeof createIssueSchema>
 
 const NewIssuePage = () => {
  const route = useRouter()
- const [error , setError] = useState('')
+ const [error , setError] = useState('');
+ const [isSubmiting , setIsSubmiting] = useState(false)
   const {register , control , handleSubmit , formState : {errors}}= useForm<IssueForm>({
     resolver : zodResolver(createIssueSchema)
    });
@@ -29,9 +31,11 @@ const NewIssuePage = () => {
       <form className='space-y-2' onSubmit={handleSubmit(async(data) =>
         {
           try{
+            setIsSubmiting(true)
             await axios.post('/api/issues' , data)
             route.push('/issues')
           }catch(error){
+            setIsSubmiting(false)
             setError('An Usexpected Error Accurred ')
           }
         
@@ -48,7 +52,7 @@ const NewIssuePage = () => {
           />
          <ErrorMessage >{errors.description?.message}</ErrorMessage>
           
-          <Button>Submit New Issue</Button>
+          <Button disabled={isSubmiting}>Submit New Issue {isSubmiting && <Spinner/>}</Button>
       </form>
     </div>
   )
